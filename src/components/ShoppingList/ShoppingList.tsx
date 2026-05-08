@@ -1,7 +1,8 @@
 import { useState, type ChangeEvent } from "react";
+import type { Item } from "../../types/types";
 
 export const ShoppingList = () => {
-  const [items, setItems] = useState<string[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [input, setInput] = useState("");
 
   const handleInput = (e: ChangeEvent<HTMLInputElement>) =>
@@ -10,15 +11,19 @@ export const ShoppingList = () => {
   const handleAdd = () => {
     const value = input.trim();
     if (value) {
-      setItems(prev => [...prev, value]);
+      const item: Item = {
+        id: Date.now().toString(),
+        item: value,
+      };
+      setItems(prev => [...prev, item]);
       setInput("");
     }
   };
 
   const handleClearAll = () => setItems([]);
 
-  const handleDelete = (index: number) =>
-    setItems(prev => prev.filter((_, i) => i !== index));
+  const handleDelete = (id: Item["id"]) =>
+    setItems(prev => prev.filter(item => id !== item.id));
 
   return (
     <div data-testid="shopping-list">
@@ -36,18 +41,18 @@ export const ShoppingList = () => {
         Add
       </button>
       <button onClick={handleClearAll}>Clear all</button>
-      <ul>
-        {items.length > 0 ? (
-          items.map((item, index) => (
-            <li key={index}>
-              <p>{item}</p>
-              <button onClick={() => handleDelete(index)}>Delete</button>
+      {items.length > 0 ? (
+        <ul>
+          {items.map(item => (
+            <li key={item.id}>
+              <p>{item.item}</p>
+              <button onClick={() => handleDelete(item.id)}>Delete</button>
             </li>
-          ))
-        ) : (
-          <p>There is no items yet</p>
-        )}
-      </ul>
+          ))}
+        </ul>
+      ) : (
+        <p>There is no items yet.</p>
+      )}
     </div>
   );
 };
